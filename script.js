@@ -345,43 +345,42 @@ function setupDailyQuote() {
     const refreshBtn = document.getElementById('refresh-quote');
     const quoteContainer = document.querySelector('.daily-quote');
     
-    // 获取新的每日一言
+    // 获取新的每日一言（直接使用一言API）
     function fetchNewQuote() {
-        // 显示加载状态
+        // A显示加载状态
         quoteText.textContent = '正在获取每日一言...';
         quoteAuthor.textContent = '';
         
         // 添加正在切换的动画类
         quoteContainer.classList.add('quote-changing');
         
-        // 发起请求获取一言
-        fetch('https://v1.hitokoto.cn')
+        // 直接使用一言国际版API
+        fetch('https://international.v1.hitokoto.cn/?c=j&encode=json')
             .then(response => response.json())
             .then(data => {
-                // 移除动画类
                 setTimeout(() => {
                     quoteContainer.classList.remove('quote-changing');
                     
                     // 更新一言内容
                     quoteText.textContent = data.hitokoto;
                     quoteAuthor.textContent = data.from_who ? `— ${data.from_who}` : 
-                                              data.from ? `— ${data.from}` : '';
+                                             data.from ? `— ${data.from}` : '';
                     
                     // 保存到本地存储，附带时间戳
                     const quoteData = {
                         text: data.hitokoto,
                         author: data.from_who || data.from || '',
-                        timestamp: Date.now() // 添加获取时间
+                        timestamp: Date.now()
                     };
                     
                     localStorage.setItem('dailyQuote', JSON.stringify(quoteData));
                 }, 300);
             })
-            .catch(error => {
+            .catch(err => {
+                console.error('获取一言失败:', err);
                 quoteContainer.classList.remove('quote-changing');
                 quoteText.textContent = '生活明朗，万物可爱。';
                 quoteAuthor.textContent = '— 网络';
-                console.error('获取一言失败:', error);
             });
     }
     
